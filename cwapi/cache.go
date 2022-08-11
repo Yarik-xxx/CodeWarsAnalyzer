@@ -3,6 +3,7 @@ package cwapi
 import (
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"os"
 )
 
@@ -12,6 +13,28 @@ type Cache struct {
 
 // Init инициализирует кэш рангов кат из файла cache.json
 func (c *Cache) Init() error {
+	if _, err := os.Stat("cache/cache.json"); os.IsNotExist(err) {
+		log.Printf("Cache file not found. Create a new file:\n")
+		log.Printf("...creating a \"cache\" folder\n")
+		if err := os.Mkdir("cache", 0777); err != nil {
+			return err
+		}
+
+		log.Printf("...creating a \"cache.json\" file\n")
+		f, err := os.Create("cache/cache.json")
+		defer f.Close()
+		if err != nil {
+			return err
+		}
+
+		_, err = f.Write([]byte("{}"))
+
+		if err != nil {
+			return err
+		}
+		log.Printf("...ready\n")
+	}
+
 	f, err := os.Open("cache/cache.json")
 	defer f.Close()
 	if err != nil {
