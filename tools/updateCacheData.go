@@ -1,12 +1,12 @@
 package main
 
 import (
+	"CodeWarsAnalyzer/cwapi"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
-	"mySite/cwapi"
 	"net/http"
 	"sync"
 	"time"

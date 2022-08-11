@@ -2,19 +2,25 @@ package main
 
 import (
 	"CodeWarsAnalyzer/cwapi"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
+	"os"
+	"strconv"
 )
 
 var cache cwapi.Cache
 
-const port = "8080"
+//const port = "8080"
 
 func main() {
 	// Загрузка Cache
 	err := cache.Init()
 	checkError(err)
+
+	// Получение порта
+	port := getPort()
 
 	// Роутинг
 	mux := http.NewServeMux()
@@ -52,4 +58,16 @@ func checkError(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func getPort() string {
+	args := os.Args
+	if len(args) < 2 || len(args) > 2 {
+		return "8080"
+	}
+
+	port, err := strconv.Atoi(args[1])
+	checkError(err)
+
+	return fmt.Sprintf("%d", port)
 }
