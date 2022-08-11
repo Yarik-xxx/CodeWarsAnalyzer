@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ru" class="h-100">
+   <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="Сервис допуска к экзамену">
+      <meta name="author" content="Онофрийчук Ярослав">
+      <title>CCW | Calculation of completed tasks</title>
+      <link rel="shortcut icon" href="static/ICON/favicon.ico" type="image/x-icon">
+      <link href="static/CSS/bootstrap.css" rel="stylesheet">
+      <link href="">
+      <meta name="theme-color" content="#712cf9">
+      <link href="static/CSS/main.css" rel="stylesheet">
+   </head>
+   <body>
+      <main>
+         <div class="container py-4">
+
+            <!-- Навигационная панель -->
+            <header class="pb-3 mb-4 border-bottom">
+               <a href="/" class="d-flex align-items-center text-dark text-decoration-none">
+               <span class="fs-4"><img src="/static/ICON/logo.png" width="45"></span>
+               <span class="fs-4">CCW  |<span style="font-size: 75%">   Подсчет выполненных кат</span> </span>
+               </a>
+            </header>
+
+            <!-- Отображение приветственного блока -->
+
+            {{ if or (not .Username) (.Err.IsError) }}
+            <div class="p-5 mb-4 bg-light rounded-3">
+               <div class="container-fluid py-5">
+                  <h1 class="display-5 fw-bold">Инструкция</h1>
+                  <p class="col-md-8 fs-4">
+                     Приветствую на сервисе по подсчету количества решенных кат на сайте CodeWars.com.
+                     Чтобы получить данные о конкретном пользователе, нужно указать его Username.
+                  </p>
+                  <p class="col-md-8 fs-4">
+                     <span style="color: darkred">Внимание!</span> Если у пользователя несколько тысяч решенных кат, то сбор статистики может занять некоторое время.
+                  </p>
+               </div>
+            </div>
+            <!-- Отображение строки поиска или ошибки поиска при работе с главной страницой -->
+            <form class="d-flex" role="search" style="padding-bottom: 2%">
+               {{ if .Err.IsError }}
+               <input class="form-control me-2" type="search" name="search" placeholder="{{ .Err.NameError }}" aria-label="Имя пользователя">
+               {{ else }}
+               <input class="form-control me-2" type="search" name="search" placeholder="Имя пользователя или ссылка на аккаунт" aria-label="Имя пользователя">
+               {{ end }}
+               <button class="btn btn-outline-success" type="submit"><span style="vertical-align: inherit;">Go</span></button>
+            </form>
+            {{ end }}
+
+            <!-- Форма поиска -->
+            {{ if .Username }}
+            <form class="d-flex" role="search" style="padding-bottom: 2%">
+               <input class="form-control me-2" type="search" name="search" placeholder="Имя пользователя или ссылка на аккаунт" aria-label="Имя пользователя или ссылка на аккаунт">
+               <button class="btn btn-outline-success" type="submit"><span style="vertical-align: inherit;">Go</span></button>
+            </form>
+
+            <!-- Основная информация о пользователе -->
+            <div class="p-5 mb-4 bg-light rounded-3">
+               <div class="container-fluid py-5">
+                  <h1 class="display-5 fw-bold">{{ .Username }}</h1>
+                  <table class="table">
+                     <tbody>
+                        <tr>
+                           <td><span style="vertical-align: inherit; font-size: 140%;">Ранг: {{ .Ranks.Overall.NameRank }}</span></td>
+                           <td><span style="vertical-align: inherit; font-size: 140%;">Баллов: {{ .Honor }}</span></td>
+                           <td><span style="vertical-align: inherit; font-size: 140%;">Место: {{ .LeaderboardPosition }}</span></td>
+                           <td><span style="vertical-align: inherit; font-size: 140%;">Всего решено: {{ .CodeChallenges.TotalCompleted }}</span></td>
+                        </tr>
+                     </tbody>
+                  </table>
+                  <a href="https://www.codewars.com/users/{{ .Username }}" target="_blank">
+                  <button class="btn btn-primary btn-lg" type="button">Просмотр аккаунта</button>
+                  </a>
+               </div>
+            </div>
+
+            <!-- Вывод статистики решенных кат -->
+            <div class="row align-items-md-stretch">
+               <!-- Вывод статистики по отдельным языкам -->
+               {{ range $lang, $row := .CountLangCompleted }}
+               <div class="col-md-6" style="padding-top: 2%">
+                  <div class="h-100 p-5 text-bg-dark rounded-3">
+                     <h2>
+                        {{ $lang }}
+                        ({{ len (index $.LanguagesTotalCompleted $lang) }})
+                     </h2>
+
+                     <table class="table">
+                        <tbody>
+                           {{ range $kyu, $count := $row }}
+                           <tr>
+                              <td><span style="vertical-align: inherit; color: aliceblue; font-size: 120%;">{{ $kyu }}</span></td>
+                              <td><span style="vertical-align: inherit; color: aliceblue; font-size: 120%;">{{ $count }}</span></td>
+                           </tr>
+                           {{ end }}
+                        </tbody>
+                     </table>
+                  </div>
+               </div>
+               {{ end }}
+            </div>
+            {{ end }}
+
+            <!-- Футер -->
+<!--            <footer class="pt-3 mt-4 text-muted border-top">-->
+<!--               &copy; 2022-->
+<!--            </footer>-->
+         </div>
+      </main>
+   </body>
+</html>
