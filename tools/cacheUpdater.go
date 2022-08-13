@@ -23,6 +23,7 @@ func main() {
 	countCache := len(cache.CacheData)
 	countIter := 0
 	countUpdate := 0
+	updatedKata := make(map[string]string)
 	fmt.Printf("Estimated update time: %.2f minutes\n", float32(countCache)/200)
 
 	for id, oldKyu := range cache.CacheData {
@@ -32,8 +33,9 @@ func main() {
 
 		countIter++
 		fmt.Printf(
-			"\rReady for %.2f%% (updates: %d, left kata: %d)",
-			float32(countIter)/float32(countCache)*100, countUpdate, countCache-countIter)
+			"\rReady for %.2f%% (updates: %d, left kata: %d, minutes left: %.2f)",
+			float32(countIter)/float32(countCache)*100, countUpdate, countCache-countIter,
+			float32(countCache-countIter)/200)
 
 		// Время было выбрано из эксперементального расчета максимального колличества запросов в минуту (200/мин или 1/300 мсек)
 		time.Sleep(300 * time.Millisecond)
@@ -42,13 +44,20 @@ func main() {
 			newKyu, ok := comparisonKyu(id, oldKyu)
 			if ok {
 				countUpdate++
-				log.Printf("Update kyu (%s): %s --> %s", id, oldKyu, newKyu)
+
 				mtCache.Lock()
+				updatedKata[id] = newKyu
 				cache.UpdateCache(id, newKyu)
 				mtCache.Unlock()
 			}
 		}(id, oldKyu)
 	}
+
+	fmt.Println()
+	for id, kyu := range updatedKata {
+		fmt.Println(id, "-->", kyu)
+	}
+
 	err := cache.UpdateFileCache()
 	if err != nil {
 		log.Fatal(err)
